@@ -1,5 +1,5 @@
 # MSI-LED-Tool
-This is a tiny project to allow modification of the LEDs of a MSI GTX 1080/1070 Gaming X card without the requirement of all the bloatware that the MSI tooling includes.
+This is a tiny project to allow modification of the LEDs of a MSI GTX 1080/1070 Gaming X card without the requirement of all the bloatware that the MSI tooling includes. Other MSI cards are very likely to work as well, but right now the code performs a check specifically for the device code of GTX 1070/GTX 1080 cards as well as the MSI brand subvendor code.
 
 As of its original release it includes a fix color and the breathing mode. I mixed them up a bit and called it "Flashing" in this application. If you need the original Flashing mode or any custom mode and you aren't a developer, just [create a new issue](https://github.com/Vipeax/MSI-LED-Tool/issues/new) describing the desired effect.
 
