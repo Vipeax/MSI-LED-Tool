@@ -8,3 +8,6 @@ As of its original release it includes a fix color and the breathing mode. I mix
 * You have to point the path in the "regedit.reg" accordingly to your newly created and selected folder.
 * Open the Settings.json file to change the R(ed), G(reen), B(lue) variables to your desired color scheme and toggle "EnableFlashing" accordingly if you desire the breathing animation. 
 * Run the "MSI LED Tool" executable and if you like what you see, run the "regedit.reg" file to register the tool to startup upon Windows boot, after which it will automatically apply your configured settings.
+
+# Releases
+For bundled releases, see [the releases area](https://github.com/Vipeax/MSI-LED-Tool/releases).
