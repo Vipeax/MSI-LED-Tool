@@ -21,7 +21,7 @@ namespace MSI_LED_Tool
 
         #region AMD
         #region Polaris
-        public const string DeviceCodeRx470With4G = "67DF";
+        public const string DeviceCodeRxPolaris = "67DF";
         #endregion
         #endregion
 
@@ -31,7 +31,7 @@ namespace MSI_LED_Tool
             DeviceCodeGtx1070,
             DeviceCodeGtx1060With6G,
             DeviceCodeGtx1060With3G,
-            DeviceCodeRx470With4G
+            DeviceCodeRxPolaris
         };
     }
 }

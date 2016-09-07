@@ -5,12 +5,19 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace MSI_LED_Tool
 {
     class Program
     {
         private const string SettingsFileName = "Settings.json";
+
+        [DllImport("Lib\\NDA.dll", CharSet = CharSet.Unicode)]
+        public static extern bool NDA_Initialize();
+
+        [DllImport("Lib\\ADL.dll", CharSet = CharSet.Unicode)]
+        public static extern bool ADL_Initialize();
 
         [DllImport("Lib\\NDA.dll", CharSet = CharSet.Unicode)]
         private static extern bool NDA_GetGPUCounts(out long gpuCounts);
@@ -21,6 +28,16 @@ namespace MSI_LED_Tool
         [DllImport("Lib\\NDA.dll", CharSet = CharSet.Unicode)]
         private static extern bool NDA_SetIlluminationParmColor_RGB(int iAdapterIndex, int cmd, int led1, int led2, int ontime, int offtime, int time, int darktime, int bright, int r, int g, int b, bool one = false);
 
+        [DllImport("Lib\\ADL.dll", CharSet = CharSet.Unicode)]
+        public static extern bool ADL_GetGPUCounts(out int gpuCounts);
+
+        [DllImport("Lib\\ADL.dll", CharSet = CharSet.Unicode)]
+        public static extern bool ADL_GetGraphicsInfo(int iAdapterIndex, out AdlGraphicsInfo graphicsInfo);
+
+        [DllImport("Lib\\ADL.dll", CharSet = CharSet.Unicode)]
+        public static extern bool ADL_SetIlluminationParm_RGB(int iAdapterIndex, int cmd, int led1, int led2, int ontime, int offtime, int time, int darktime, int bright, int r, int g, int b, bool one = false);
+
+
         private static Thread updateThreadFront;
         private static Thread updateThreadBack;
         private static Thread updateThreadSide;
@@ -30,9 +47,11 @@ namespace MSI_LED_Tool
         private static bool vgaMutex;
         private static Color ledColor;
         private static AnimationType animationType;
+        private static Manufacturer manufacturer;
 
         static void Main(string[] args)
         {
+
             string settingsFile = $"{AppDomain.CurrentDomain.BaseDirectory}\\{SettingsFileName}";
 
             if (File.Exists(settingsFile))
@@ -52,7 +71,14 @@ namespace MSI_LED_Tool
             {
                 using (var sw = new StreamWriter(settingsFile, false))
                 {
-                    sw.WriteLine(JsonSerializer<LedSettings>.Serialize(new LedSettings { R = 255, G = 0, B = 0, AnimationType = AnimationType.NoAnimation }));
+                    sw.WriteLine(
+                        JsonSerializer<LedSettings>.Serialize(new LedSettings
+                        {
+                            R = 255,
+                            G = 0,
+                            B = 0,
+                            AnimationType = AnimationType.NoAnimation
+                        }));
                 }
             }
 
@@ -63,31 +89,35 @@ namespace MSI_LED_Tool
             }
 
             adapterIndexes = new List<int>();
-            long gpuCount;
-            bool canGetGpuCount = NDA_GetGPUCounts(out gpuCount);
-            if (canGetGpuCount == false)
-            {
-                return;
-            }
 
-            for (int i = 0; i < gpuCount; i++)
+            long gpuCountNda = 0;
+
+            if (NDA_Initialize())
             {
-                NdaGraphicsInfo graphicsInfo;
-                if (NDA_GetGraphicsInfo(i, out graphicsInfo) == false)
+                bool canGetGpuCount = NDA_GetGPUCounts(out gpuCountNda);
+                if (canGetGpuCount == false)
                 {
                     return;
                 }
 
-                string vendorCode = graphicsInfo.Card_pDeviceId.Substring(4, 4).ToUpper();
-                string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
-                string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
-
-                if ((vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
-                    || vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase))
-                    && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
-                    && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
+                if (gpuCountNda > 0 && InitializeNvidiaAdapters(gpuCountNda))
                 {
-                    adapterIndexes.Add(i);
+                    manufacturer = Manufacturer.Nvidia;
+                }
+            }
+
+            if (gpuCountNda == 0 && ADL_Initialize())
+            {
+                int gpuCountAdl;
+                bool canGetGpuCount = ADL_GetGPUCounts(out gpuCountAdl);
+                if (canGetGpuCount == false)
+                {
+                    return;
+                }
+
+                if (gpuCountAdl > 0 && InitializeAmdAdapters(gpuCountAdl))
+                {
+                    manufacturer = Manufacturer.AMD;
                 }
             }
 
@@ -100,11 +130,83 @@ namespace MSI_LED_Tool
                 updateThreadSide.Start();
                 updateThreadBack.Start();
             }
+            else
+            {
+                MessageBox.Show(
+                    "No adapters found that are supported by this tool. Report a new issue with a GPU-Z screenshot if you want your card added.",
+                    "No supported adapter(s) found.");
+            }
 
             while (true)
             {
                 Thread.CurrentThread.Join(new TimeSpan(1, 0, 0));
             }
+        }
+
+        private static bool InitializeNvidiaAdapters(long gpuCount)
+        {
+            for (int i = 0; i < gpuCount; i++)
+            {
+                NdaGraphicsInfo graphicsInfo;
+                if (NDA_GetGraphicsInfo(i, out graphicsInfo) == false)
+                {
+                    return false;
+                }
+
+                string vendorCode = graphicsInfo.Card_pDeviceId.Substring(4, 4).ToUpper();
+                string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
+                string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
+
+                if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
+                    && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
+                    && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
+                {
+                    adapterIndexes.Add(i);
+                }
+            }
+
+            return true;
+        }
+
+        private static bool InitializeAmdAdapters(int gpuCount)
+        {
+            for (int i = 0; i < gpuCount; i++)
+            {
+                AdlGraphicsInfo graphicsInfo;
+                if (ADL_GetGraphicsInfo(i, out graphicsInfo) == false)
+                {
+                    return false;
+                }
+
+                // PCI\VEN_1002&DEV_67DF&SUBSYS_34111462&REV_CF\4&25438C51&0&0008
+                var pnpSegments = graphicsInfo.Card_PNP.Split('\\');
+                
+                if (pnpSegments.Length < 2)
+                {
+                    continue;
+                }
+
+                // VEN_1002&DEV_67DF&SUBSYS_34111462&REV_CF
+                var codeSegments = pnpSegments[1].Split('&');
+
+                if (codeSegments.Length < 3)
+                {
+                    continue;
+                }
+
+                string vendorCode = codeSegments[0].Substring(4, 4).ToUpper();
+                string deviceCode = codeSegments[1].Substring(4, 4).ToUpper();
+                string subVendorCode = codeSegments[2].Substring(11, 4).ToUpper();
+
+                if (vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase)
+                    && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
+                    && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
+                {
+                    adapterIndexes.Add(i);
+                }
+            }
+
+            return true;
         }
 
         private static void UpdateLedsFront()
@@ -188,7 +290,17 @@ namespace MSI_LED_Tool
 
                 bool oneCall = animationType != AnimationType.NoAnimation;
 
-                NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R, ledColor.G, ledColor.B, oneCall);
+                if (manufacturer == Manufacturer.Nvidia)
+                {
+                    NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R,
+                        ledColor.G, ledColor.B, oneCall);
+                }
+
+                if (manufacturer == Manufacturer.AMD)
+                {
+                    ADL_SetIlluminationParm_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R,
+                        ledColor.G, ledColor.B, oneCall);
+                }
 
                 vgaMutex = false;
             }
