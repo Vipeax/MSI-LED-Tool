@@ -82,7 +82,8 @@ namespace MSI_LED_Tool
                 string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
                 string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
 
-                if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
+                if ((vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
+                    || vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase))
                     && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
                     && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
                 {
