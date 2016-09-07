@@ -6,7 +6,7 @@ namespace MSI_LED_Tool
     public class LedSettings
     {
         [DataMember]
-        public bool EnableFlashing { get; set; }
+        public AnimationType AnimationType { get; set; }
 
         [DataMember]
         public int R { get; set; }

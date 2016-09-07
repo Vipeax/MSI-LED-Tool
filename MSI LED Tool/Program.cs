@@ -28,8 +28,8 @@ namespace MSI_LED_Tool
 
         private static bool vgaMutex;
         private static Color ledColor;
-        private static bool useFlashing;
-        
+        private static AnimationType animationType;
+
         static void Main(string[] args)
         {
             string settingsFile = $"{AppDomain.CurrentDomain.BaseDirectory}\\{SettingsFileName}";
@@ -43,7 +43,7 @@ namespace MSI_LED_Tool
                     if (settings != null)
                     {
                         ledColor = Color.FromArgb(255, settings.R, settings.G, settings.B);
-                        useFlashing = settings.EnableFlashing;
+                        animationType = settings.AnimationType;
                     }
                 }
             }
@@ -51,14 +51,14 @@ namespace MSI_LED_Tool
             {
                 using (var sw = new StreamWriter(settingsFile, false))
                 {
-                    sw.WriteLine(JsonSerializer<LedSettings>.Serialize(new LedSettings { R = 255, G = 0, B = 0, EnableFlashing = true }));
+                    sw.WriteLine(JsonSerializer<LedSettings>.Serialize(new LedSettings { R = 255, G = 0, B = 0, AnimationType = AnimationType.NoAnimation }));
                 }
             }
 
             if (ledColor == null)
             {
                 ledColor = Color.Red;
-                useFlashing = false;
+                animationType = AnimationType.NoAnimation;
             }
 
             adapterIndexes = new List<int>();
@@ -80,11 +80,11 @@ namespace MSI_LED_Tool
                 string vendorCode = graphicsInfo.Card_pDeviceId.Substring(4, 4).ToUpper();
                 string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
                 string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
-                                     //nVidia
+                //nVidia
                 if (vendorCode.Equals("10DE", StringComparison.OrdinalIgnoreCase)
-                                         //1080                                                           //1070
+                    //1080                                                           //1070
                     && (deviceCode.Equals("1B80", StringComparison.OrdinalIgnoreCase) || deviceCode.Equals("1B81", StringComparison.OrdinalIgnoreCase))
-                                            //MSI
+                    //MSI
                     && subVendorCode.Equals("1462", StringComparison.OrdinalIgnoreCase))
                 {
                     adapterIndexes.Add(i);
@@ -111,16 +111,44 @@ namespace MSI_LED_Tool
         {
             while (true)
             {
-                UpdateLeds(useFlashing ? 27 : 21, 4, useFlashing ? 7 : 4);
+                switch (animationType)
+                {
+                    case AnimationType.NoAnimation:
+                        UpdateLeds(21, 4, 4);
+                        break;
+                    case AnimationType.Breathing:
+                        UpdateLeds(27, 4, 7);
+                        break;
+                    case AnimationType.Flashing:
+                        UpdateLeds(28, 4, 0, 25, 100);
+                        break;
+                    case AnimationType.DoubleFlashing:
+                        UpdateLeds(30, 4, 0, 10, 10, 91);
+                        break;
+                }
             }
         }
 
-     
+
         private static void UpdateLedsSide()
         {
             while (true)
             {
-               UpdateLeds(useFlashing ? 27 : 21, 1, useFlashing ? 7 : 4);
+                switch (animationType)
+                {
+                    case AnimationType.NoAnimation:
+                        UpdateLeds(21, 1, 4);
+                        break;
+                    case AnimationType.Breathing:
+                        UpdateLeds(27, 1, 7);
+                        break;
+                    case AnimationType.Flashing:
+                        UpdateLeds(28, 1, 0, 25, 100);
+                        break;
+                    case AnimationType.DoubleFlashing:
+                        UpdateLeds(30, 1, 0, 10, 10, 91);
+                        break;
+                }
             }
         }
 
@@ -128,11 +156,25 @@ namespace MSI_LED_Tool
         {
             while (true)
             {
-               UpdateLeds(useFlashing ? 27 : 21, 2, useFlashing ? 7 : 4);
+                switch (animationType)
+                {
+                    case AnimationType.NoAnimation:
+                        UpdateLeds(21, 2, 4);
+                        break;
+                    case AnimationType.Breathing:
+                        UpdateLeds(27, 2, 7);
+                        break;
+                    case AnimationType.Flashing:
+                        UpdateLeds(28, 2, 0, 25, 100);
+                        break;
+                    case AnimationType.DoubleFlashing:
+                        UpdateLeds(30, 2, 0, 10, 10, 91);
+                        break;
+                }
             }
         }
 
-        private static void UpdateLeds(int cmd, int ledId, int time)
+        private static void UpdateLeds(int cmd, int ledId, int time, int ontime = 0, int offtime = 0, int darkTime = 0)
         {
             for (int i = 0; i < adapterIndexes.Count; i++)
             {
@@ -144,9 +186,10 @@ namespace MSI_LED_Tool
                 vgaMutex = true;
                 Thread.CurrentThread.Join(20);
 
-                NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, 0, 0, time, 0, 0, ledColor.R, ledColor.G, ledColor.B,
-                    useFlashing);
-                
+                bool oneCall = animationType != AnimationType.NoAnimation;
+
+                NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R, ledColor.G, ledColor.B, oneCall);
+
                 vgaMutex = false;
             }
 

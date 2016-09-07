@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationType.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="LedSettings.cs" />
     <Compile Include="NdaGraphicsInfo.cs" />
