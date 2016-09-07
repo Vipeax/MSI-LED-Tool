@@ -6,7 +6,7 @@ It supports a fixed color, breathing mode, flashing mode and double flashing mod
 # Installation
 * To install the tool you place the "MSI LED Tool" executable, the "Settings.json" file and the included "Lib" folder in whichever folder you desire to be its location.
 * You have to point the path in the "regedit.reg" accordingly to your newly created and selected folder.
-* Open the Settings.json file to change the R(ed), G(reen), B(lue) variables to your desired color scheme and set the AnimationType variable to your desired animation type. "AnimationType":0 means no animation.
+* Open the Settings.json file to change the R(ed), G(reen), B(lue) variables to your desired color scheme and set the AnimationType variable to your desired animation type. "AnimationType":1 means no animation.
 	* 1 = No Animation
 	* 2 = Breathing
 	* 3 = Flashing
