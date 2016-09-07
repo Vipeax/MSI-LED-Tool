@@ -41,6 +41,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,10 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdlGraphicsInfo.cs" />
     <Compile Include="AnimationType.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="LedSettings.cs" />
+    <Compile Include="Manufacturer.cs" />
     <Compile Include="NdaGraphicsInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
