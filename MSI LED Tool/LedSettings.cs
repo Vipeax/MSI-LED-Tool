@@ -16,5 +16,11 @@ namespace MSI_LED_Tool
 
         [DataMember]
         public int B { get; set; }
+
+        [DataMember]
+        public int TemperatureUpperLimit { get; set; }
+
+        [DataMember]
+        public int TemperatureLowerLimit { get; set; }
     }
 }

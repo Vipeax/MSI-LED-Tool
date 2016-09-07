@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -48,6 +49,7 @@ namespace MSI_LED_Tool
         private static Color ledColor;
         private static AnimationType animationType;
         private static Manufacturer manufacturer;
+        private static int[] temperatureLimits;
 
         static void Main(string[] args)
         {
@@ -64,6 +66,23 @@ namespace MSI_LED_Tool
                     {
                         ledColor = Color.FromArgb(255, settings.R, settings.G, settings.B);
                         animationType = settings.AnimationType;
+
+                        if (settings.TemperatureLowerLimit < 0)
+                        {
+                            settings.TemperatureLowerLimit = 0;
+                        }
+
+                        if (settings.TemperatureUpperLimit > 100)
+                        {
+                            settings.TemperatureUpperLimit = 100;
+                        }
+
+                        if (settings.TemperatureUpperLimit <= settings.TemperatureLowerLimit)
+                        {
+                            settings.TemperatureUpperLimit = settings.TemperatureLowerLimit + 1;
+                        }
+
+                        temperatureLimits = new[] { settings.TemperatureLowerLimit, settings.TemperatureUpperLimit};
                     }
                 }
             }
@@ -77,7 +96,9 @@ namespace MSI_LED_Tool
                             R = 255,
                             G = 0,
                             B = 0,
-                            AnimationType = AnimationType.NoAnimation
+                            AnimationType = AnimationType.NoAnimation,
+                            TemperatureUpperLimit = 85,
+                            TemperatureLowerLimit = 45,
                         }));
                 }
             }
@@ -147,7 +168,7 @@ namespace MSI_LED_Tool
         {
             for (int i = 0; i < gpuCount; i++)
             {
-                NdaGraphicsInfo graphicsInfo;
+                NdaGraphicsInfo graphicsInfo; 
                 if (NDA_GetGraphicsInfo(i, out graphicsInfo) == false)
                 {
                     return false;
@@ -177,7 +198,7 @@ namespace MSI_LED_Tool
                 {
                     return false;
                 }
-
+                
                 // PCI\VEN_1002&DEV_67DF&SUBSYS_34111462&REV_CF\4&25438C51&0&0008
                 var pnpSegments = graphicsInfo.Card_PNP.Split('\\');
                 
@@ -227,6 +248,34 @@ namespace MSI_LED_Tool
                     case AnimationType.DoubleFlashing:
                         UpdateLeds(30, 4, 0, 10, 10, 91);
                         break;
+                    case AnimationType.Off:
+                        UpdateLeds(24, 4, 4);
+                        break;
+                    case AnimationType.TemperatureBased:
+                        switch (manufacturer)
+                        {
+                            case Manufacturer.Nvidia:
+                                NdaGraphicsInfo ndaGraphicsInfo;
+                                if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 4, 4);
+                                }
+                                break;
+                            case Manufacturer.AMD:
+                                AdlGraphicsInfo adlGraphicsInfo;
+                                if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], adlGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 4, 4);
+                                }
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -250,6 +299,34 @@ namespace MSI_LED_Tool
                     case AnimationType.DoubleFlashing:
                         UpdateLeds(30, 1, 0, 10, 10, 91);
                         break;
+                    case AnimationType.Off:
+                        UpdateLeds(24, 1, 4);
+                        break;
+                    case AnimationType.TemperatureBased:
+                        switch (manufacturer)
+                        {
+                            case Manufacturer.Nvidia:
+                                NdaGraphicsInfo ndaGraphicsInfo;
+                                if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 1, 4);
+                                }
+                                break;
+                            case Manufacturer.AMD:
+                                AdlGraphicsInfo adlGraphicsInfo;
+                                if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], adlGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 1, 4);
+                                }
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -272,6 +349,34 @@ namespace MSI_LED_Tool
                     case AnimationType.DoubleFlashing:
                         UpdateLeds(30, 2, 0, 10, 10, 91);
                         break;
+                    case AnimationType.Off:
+                        UpdateLeds(24, 2, 4);
+                        break;
+                    case AnimationType.TemperatureBased:
+                        switch (manufacturer)
+                        {
+                            case Manufacturer.Nvidia:
+                                NdaGraphicsInfo ndaGraphicsInfo;
+                                if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 2, 4);
+                                }
+                                break;
+                            case Manufacturer.AMD:
+                                AdlGraphicsInfo adlGraphicsInfo;
+                                if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
+                                {
+                                    int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
+                                        temperatureLimits[1], adlGraphicsInfo.GPU_Temperature_Current);
+                                    ledColor = GetColorForDeltaTemperature(temperatureDelta);
+                                    UpdateLeds(21, 2, 4);
+                                }
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -292,20 +397,67 @@ namespace MSI_LED_Tool
 
                 if (manufacturer == Manufacturer.Nvidia)
                 {
-                    NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R,
-                        ledColor.G, ledColor.B, oneCall);
+                    NDA_SetIlluminationParmColor_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R, ledColor.G, ledColor.B, oneCall);
                 }
 
                 if (manufacturer == Manufacturer.AMD)
                 {
-                    ADL_SetIlluminationParm_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R,
-                        ledColor.G, ledColor.B, oneCall);
+                    ADL_SetIlluminationParm_RGB(i, cmd, ledId, 0, ontime, offtime, time, darkTime, 0, ledColor.R, ledColor.G, ledColor.B, oneCall);
                 }
 
                 vgaMutex = false;
             }
 
             Thread.CurrentThread.Join(2000);
+        }
+
+        private static int CalculateTemperatureDeltaHunderdBased(int upperLimit, int lowerLimit, int current)
+        {
+            try
+            {
+                var difference = upperLimit - lowerLimit;
+                if (difference <= 0)
+                {
+                    return 50;
+                }
+
+                return (current/difference*100);
+            }
+            catch
+            {
+                return 50;
+            }
+        }
+
+        private static Color GetColorForDeltaTemperature(int x)
+        {
+            return Color.FromArgb(GetRedForDeltaTemperature(x), GetGreenForDeltaTemperature(x), 0);
+        }
+
+        private static int GetRedForDeltaTemperature(int x)
+        {
+            var percent = x/100.0f;
+            var value = Convert.ToInt32(percent * 255 * 2);
+
+            if (value > 255)
+            {
+                return 255;
+            }
+
+            return value;
+        }
+
+        private static int GetGreenForDeltaTemperature(int x)
+        {
+            var percent = x / 100.0f;
+            var value = Convert.ToInt32((255 - percent * 255) * 2);
+
+            if (value > 255)
+            {
+                return 255;
+            }
+
+            return value;
         }
     }
 }

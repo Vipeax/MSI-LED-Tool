@@ -6,11 +6,13 @@ It supports a fixed color, breathing mode, flashing mode and double flashing mod
 # Installation
 * To install the tool you place the "MSI LED Tool" executable, the "Settings.json" file and the included "Lib" folder in whichever folder you desire to be its location.
 * You have to point the path in the "regedit.reg" accordingly to your newly created and selected folder.
-* Open the Settings.json file to change the R(ed), G(reen), B(lue) variables to your desired color scheme and set the AnimationType variable to your desired animation type. "AnimationType":1 means no animation.
+* Open the Settings.json file to change the R(ed), G(reen), B(lue) variables to your desired color scheme and set the AnimationType variable to your desired animation type. "AnimationType":1 means no animation. When selecting the "Temperature Based" mode. The Upper- and LowerLimit options define the full green (lower) and full red (upper) numbers. So 45-85 means that anything from 45C and lower is 100% green and anything from 85C and upper is 100% red. It will then colorize from green to yellow to orange to red as your GPU temperature changes.
 	* 1 = No Animation
 	* 2 = Breathing
 	* 3 = Flashing
 	* 4 = Double Flashing
+	* 5 = Disable LEDs
+	* 6 = Temperature Based
 * Run the "MSI LED Tool" executable and if you like what you see, run the "regedit.reg" file to register the tool to startup upon Windows boot, after which it will automatically apply your configured settings.
 
 # Releases
