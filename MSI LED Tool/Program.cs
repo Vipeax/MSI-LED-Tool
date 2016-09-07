@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -80,12 +81,10 @@ namespace MSI_LED_Tool
                 string vendorCode = graphicsInfo.Card_pDeviceId.Substring(4, 4).ToUpper();
                 string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
                 string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
-                //nVidia
-                if (vendorCode.Equals("10DE", StringComparison.OrdinalIgnoreCase)
-                    //1080                                                           //1070
-                    && (deviceCode.Equals("1B80", StringComparison.OrdinalIgnoreCase) || deviceCode.Equals("1B81", StringComparison.OrdinalIgnoreCase))
-                    //MSI
-                    && subVendorCode.Equals("1462", StringComparison.OrdinalIgnoreCase))
+
+                if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
+                    && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
+                    && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
                 {
                     adapterIndexes.Add(i);
                 }
