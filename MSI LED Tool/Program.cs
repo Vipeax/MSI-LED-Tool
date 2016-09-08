@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -51,8 +50,13 @@ namespace MSI_LED_Tool
         private static Manufacturer manufacturer;
         private static int[] temperatureLimits;
 
+        private static Mutex mutex;
+        private static NdaGraphicsInfo ndaGraphicsInfo;
+        private static AdlGraphicsInfo adlGraphicsInfo;
+
         static void Main(string[] args)
         {
+            mutex = new Mutex();
 
             string settingsFile = $"{AppDomain.CurrentDomain.BaseDirectory}\\{SettingsFileName}";
 
@@ -255,17 +259,18 @@ namespace MSI_LED_Tool
                         switch (manufacturer)
                         {
                             case Manufacturer.Nvidia:
-                                NdaGraphicsInfo ndaGraphicsInfo;
+                                mutex.WaitOne();
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                        temperatureLimits[1], 80);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 4, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                             case Manufacturer.AMD:
-                                AdlGraphicsInfo adlGraphicsInfo;
+                                mutex.WaitOne();
                                 if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
@@ -273,6 +278,7 @@ namespace MSI_LED_Tool
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 4, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                         }
                         break;
@@ -306,17 +312,18 @@ namespace MSI_LED_Tool
                         switch (manufacturer)
                         {
                             case Manufacturer.Nvidia:
-                                NdaGraphicsInfo ndaGraphicsInfo;
+                                mutex.WaitOne();
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                        temperatureLimits[1], 80);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 1, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                             case Manufacturer.AMD:
-                                AdlGraphicsInfo adlGraphicsInfo;
+                                mutex.WaitOne();
                                 if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
@@ -324,6 +331,7 @@ namespace MSI_LED_Tool
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 1, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                         }
                         break;
@@ -356,17 +364,18 @@ namespace MSI_LED_Tool
                         switch (manufacturer)
                         {
                             case Manufacturer.Nvidia:
-                                NdaGraphicsInfo ndaGraphicsInfo;
+                                mutex.WaitOne();
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
+                                        temperatureLimits[1], 80);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 2, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                             case Manufacturer.AMD:
-                                AdlGraphicsInfo adlGraphicsInfo;
+                                mutex.WaitOne();
                                 if (ADL_GetGraphicsInfo(0, out adlGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
@@ -374,6 +383,7 @@ namespace MSI_LED_Tool
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 2, 4);
                                 }
+                                mutex.ReleaseMutex();
                                 break;
                         }
                         break;
@@ -421,7 +431,7 @@ namespace MSI_LED_Tool
                     return 50;
                 }
 
-                return (current/difference*100);
+                return current/difference*100;
             }
             catch
             {
