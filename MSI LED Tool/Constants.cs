@@ -17,6 +17,9 @@ namespace MSI_LED_Tool
         public const string DeviceCodeGtx1060With6G = "1C03";
         public const string DeviceCodeGtx1060With3G = "1C02";
         #endregion
+        #region Maxwell
+        public const string DeviceCodeGtx980Ti = "17C8";
+        #endregion
         #endregion
 
         #region AMD
