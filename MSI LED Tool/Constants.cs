@@ -19,6 +19,7 @@ namespace MSI_LED_Tool
         #endregion
         #region Maxwell
         public const string DeviceCodeGtx980Ti = "17C8";
+        public const string DeviceCodeGtx960 = "1401";
         #endregion
         #endregion
 
