@@ -36,6 +36,7 @@ namespace MSI_LED_Tool
             DeviceCodeGtx1060With6G,
             DeviceCodeGtx1060With3G,
             DeviceCodeGtx980Ti,
+            DeviceCodeGtx960,
             DeviceCodeRxPolaris
         };
     }

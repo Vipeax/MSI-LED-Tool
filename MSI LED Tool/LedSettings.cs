@@ -22,5 +22,8 @@ namespace MSI_LED_Tool
 
         [DataMember]
         public int TemperatureLowerLimit { get; set; }
+
+        [DataMember]
+        public bool OverwriteSecurityChecks { get; set; }
     }
 }

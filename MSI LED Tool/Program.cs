@@ -49,6 +49,7 @@ namespace MSI_LED_Tool
         private static AnimationType animationType;
         private static Manufacturer manufacturer;
         private static int[] temperatureLimits;
+        private static bool overwriteSecurityChecks;
 
         private static Mutex mutex;
         private static NdaGraphicsInfo ndaGraphicsInfo;
@@ -87,6 +88,8 @@ namespace MSI_LED_Tool
                         }
 
                         temperatureLimits = new[] { settings.TemperatureLowerLimit, settings.TemperatureUpperLimit};
+
+                        overwriteSecurityChecks = settings.OverwriteSecurityChecks;
                     }
                 }
             }
@@ -103,6 +106,7 @@ namespace MSI_LED_Tool
                             AnimationType = AnimationType.NoAnimation,
                             TemperatureUpperLimit = 85,
                             TemperatureLowerLimit = 45,
+                            OverwriteSecurityChecks = false
                         }));
                 }
             }
@@ -111,6 +115,7 @@ namespace MSI_LED_Tool
             {
                 ledColor = Color.Red;
                 animationType = AnimationType.NoAnimation;
+                overwriteSecurityChecks = false;
             }
 
             adapterIndexes = new List<int>();
@@ -182,7 +187,14 @@ namespace MSI_LED_Tool
                 string deviceCode = graphicsInfo.Card_pDeviceId.Substring(0, 4).ToUpper();
                 string subVendorCode = graphicsInfo.Card_pSubSystemId.Substring(4, 4).ToUpper();
 
-                if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
+                if (overwriteSecurityChecks)
+                {
+                    if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase))
+                    {
+                        adapterIndexes.Add(i);
+                    }
+                }
+                else if (vendorCode.Equals(Constants.VendorCodeNvidia, StringComparison.OrdinalIgnoreCase)
                     && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
                     && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
                 {
@@ -223,7 +235,14 @@ namespace MSI_LED_Tool
                 string deviceCode = codeSegments[1].Substring(4, 4).ToUpper();
                 string subVendorCode = codeSegments[2].Substring(11, 4).ToUpper();
 
-                if (vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase)
+                if (overwriteSecurityChecks)
+                {
+                    if (vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase))
+                    {
+                        adapterIndexes.Add(i);
+                    }
+                }
+                else if (vendorCode.Equals(Constants.VendorCodeAmd, StringComparison.OrdinalIgnoreCase)
                     && subVendorCode.Equals(Constants.SubVendorCodeMsi, StringComparison.OrdinalIgnoreCase)
                     && Constants.SupportedDeviceCodes.Any(dc => deviceCode.Equals(dc, StringComparison.OrdinalIgnoreCase)))
                 {
