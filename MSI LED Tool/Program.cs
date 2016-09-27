@@ -282,7 +282,7 @@ namespace MSI_LED_Tool
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], 80);
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 4, 4);
                                 }
@@ -335,7 +335,7 @@ namespace MSI_LED_Tool
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], 80);
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 1, 4);
                                 }
@@ -387,7 +387,7 @@ namespace MSI_LED_Tool
                                 if (NDA_GetGraphicsInfo(0, out ndaGraphicsInfo))
                                 {
                                     int temperatureDelta = CalculateTemperatureDeltaHunderdBased(temperatureLimits[0],
-                                        temperatureLimits[1], 80);
+                                        temperatureLimits[1], ndaGraphicsInfo.GPU_Temperature_Current);
                                     ledColor = GetColorForDeltaTemperature(temperatureDelta);
                                     UpdateLeds(21, 2, 4);
                                 }
@@ -450,7 +450,7 @@ namespace MSI_LED_Tool
                     return 50;
                 }
 
-                return current/difference*100;
+                return Convert.ToInt32(1.0f * current/difference*100);
             }
             catch
             {
