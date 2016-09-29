@@ -440,17 +440,29 @@ namespace MSI_LED_Tool
             Thread.CurrentThread.Join(2000);
         }
 
-        private static int CalculateTemperatureDeltaHunderdBased(int upperLimit, int lowerLimit, int current)
+        private static int CalculateTemperatureDeltaHunderdBased(int lowerLimit, int upperLimit, int current)
         {
             try
             {
                 var difference = upperLimit - lowerLimit;
+                var adjustedCurrent = current - lowerLimit;
+
                 if (difference <= 0)
                 {
                     return 50;
                 }
 
-                return Convert.ToInt32(1.0f * current/difference*100);
+                if (adjustedCurrent <= 0)
+                {
+                    return 0;
+                }
+
+                if (adjustedCurrent > upperLimit)
+                {
+                    adjustedCurrent = upperLimit;
+                }
+
+                return Convert.ToInt32(1.0f * adjustedCurrent / difference * 100);
             }
             catch
             {
