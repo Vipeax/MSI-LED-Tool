@@ -462,7 +462,14 @@ namespace MSI_LED_Tool
                     adjustedCurrent = upperLimit;
                 }
 
-                return Convert.ToInt32(1.0f * adjustedCurrent / difference * 100);
+                var delta = Convert.ToInt32(1.0f * adjustedCurrent / difference * 100);
+
+                if (delta > 100)
+                {
+                    delta = 100;
+                }
+
+                return delta;
             }
             catch
             {
