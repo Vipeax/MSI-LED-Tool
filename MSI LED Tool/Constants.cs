@@ -4,7 +4,7 @@ namespace MSI_LED_Tool
 {
     internal class Constants
     {
-        #region vendors
+        #region Vendors
         public const string VendorCodeNvidia = "10DE";
         public const string VendorCodeAmd = "1002";
         public const string SubVendorCodeMsi = "1462";

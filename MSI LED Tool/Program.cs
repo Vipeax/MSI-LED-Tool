@@ -37,6 +37,8 @@ namespace MSI_LED_Tool
         [DllImport("Lib\\ADL.dll", CharSet = CharSet.Unicode)]
         public static extern bool ADL_SetIlluminationParm_RGB(int iAdapterIndex, int cmd, int led1, int led2, int ontime, int offtime, int time, int darktime, int bright, int r, int g, int b, bool one = false);
 
+        private const int DefaultDelay = 2000;
+        private const int NoAnimationDelay = 60000;
 
         private static Thread updateThreadFront;
         private static Thread updateThreadBack;
@@ -261,6 +263,7 @@ namespace MSI_LED_Tool
                 {
                     case AnimationType.NoAnimation:
                         UpdateLeds(21, 4, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.Breathing:
                         UpdateLeds(27, 4, 7);
@@ -273,6 +276,7 @@ namespace MSI_LED_Tool
                         break;
                     case AnimationType.Off:
                         UpdateLeds(24, 4, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.TemperatureBased:
                         switch (manufacturer)
@@ -314,6 +318,7 @@ namespace MSI_LED_Tool
                 {
                     case AnimationType.NoAnimation:
                         UpdateLeds(21, 1, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.Breathing:
                         UpdateLeds(27, 1, 7);
@@ -326,6 +331,7 @@ namespace MSI_LED_Tool
                         break;
                     case AnimationType.Off:
                         UpdateLeds(24, 1, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.TemperatureBased:
                         switch (manufacturer)
@@ -366,6 +372,7 @@ namespace MSI_LED_Tool
                 {
                     case AnimationType.NoAnimation:
                         UpdateLeds(21, 2, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.Breathing:
                         UpdateLeds(27, 2, 7);
@@ -378,6 +385,7 @@ namespace MSI_LED_Tool
                         break;
                     case AnimationType.Off:
                         UpdateLeds(24, 2, 4);
+                        Thread.Sleep(NoAnimationDelay);
                         break;
                     case AnimationType.TemperatureBased:
                         switch (manufacturer)
