@@ -3,6 +3,9 @@ This is a tiny project to allow modification of the LEDs of a MSI Gaming X cards
 
 It supports a fixed color, breathing mode, flashing mode and double flashing mode. If you desire a different effect or any custom mode and you aren't a developer, just [create a new issue](https://github.com/Vipeax/MSI-LED-Tool/issues/new) describing what you want.
 
+# Preview video
+https://www.youtube.com/watch?v=-cuow0x4VIk
+
 # Installation
 * To install the tool you place the "MSI LED Tool" executable, the "Settings.json" file and the included "Lib" folder in whichever folder you desire to be its location.
 * You have to point the path in the "regedit.reg" accordingly to your newly created and selected folder.
