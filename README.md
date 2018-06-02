@@ -17,3 +17,6 @@ It supports a fixed color, breathing mode, flashing mode and double flashing mod
 
 # Releases
 For bundled releases, see [the releases area](https://github.com/Vipeax/MSI-LED-Tool/releases).
+
+# Alternative projects
+* https://github.com/MinDBreaK/MSI-LED-Control
