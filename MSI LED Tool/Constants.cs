@@ -17,6 +17,8 @@ namespace MSI_LED_Tool
         public const string DeviceCodeGtx1070 = "1B81";
         public const string DeviceCodeGtx1060With6G = "1C03";
         public const string DeviceCodeGtx1060With3G = "1C02";
+        public const string DeviceCodeGtx1050 = "1C81";
+        public const string DeviceCodeGtx1050Ti = "1C82";
         #endregion
         #region Maxwell
         public const string DeviceCodeGtx980Ti = "17C8";
@@ -37,6 +39,8 @@ namespace MSI_LED_Tool
             DeviceCodeGtx1070,
             DeviceCodeGtx1060With6G,
             DeviceCodeGtx1060With3G,
+            DeviceCodeGtx1050Ti,
+            DeviceCodeGtx1050,
             DeviceCodeGtx980Ti,
             DeviceCodeGtx960,
             DeviceCodeRxPolaris
